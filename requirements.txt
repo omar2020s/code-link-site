@@ -1,52 +1,6 @@
-# Link Library Manager
-
-Flask + PostgreSQL app for Render.
-
-This is a link database with the same style as the material search website:
-- Dashboard cards
-- Add form
-- Category checkboxes
-- Multi-keyword search
-- Browse table
-- Open/Edit/Delete actions
-
-## Render Settings
-
-Build Command:
-
-```bash
-pip install -r requirements.txt
-```
-
-Start Command:
-
-```bash
-gunicorn app:app
-```
-
-Environment Variables:
-
-```text
-DATABASE_URL=your_render_internal_database_url
-SECRET_KEY=your_secret_key
-PYTHON_VERSION=3.12.8
-```
-
-## Health Check
-
-```text
-/health
-```
-
-Expected:
-
-```json
-{"status":"ok","app":"link-library"}
-```
-
-## Important
-
-- `.python-version` must stay beside `app.py`.
-- `requirements.txt` must contain package names only.
-- Do not paste `.python-version` content into `app.py`.
-- On Render, use **Clear build cache & deploy** after changing Python version.
+Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
+SQLAlchemy==2.0.30
+gunicorn==22.0.0
+psycopg[binary]==3.2.13
+Werkzeug==3.0.3
