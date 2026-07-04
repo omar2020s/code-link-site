@@ -1,34 +1,6 @@
-# Link Library Manager
-
-Flask + PostgreSQL app for Render.
-
-Use it to add, organize, search and open links.
-
-## Render settings
-
-Build Command:
-```bash
-pip install -r requirements.txt
-```
-
-Start Command:
-```bash
-gunicorn app:app
-```
-
-Environment Variables:
-```text
-DATABASE_URL=your_render_internal_database_url
-SECRET_KEY=your_secret_key
-```
-
-## Health Check
-
-```text
-/health
-```
-
-## Notes
-
-- The database table name is `link_item`.
-- This version is for links, not material quantity calculation.
+Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
+SQLAlchemy==2.0.30
+gunicorn==22.0.0
+psycopg[binary]==3.2.3
+Werkzeug==3.0.3
