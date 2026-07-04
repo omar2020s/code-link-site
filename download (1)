@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="dashboard-grid">
+    <div class="stat-card">
+        <span>Total Links</span>
+        <strong>{{ stats.total_links }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>Categories</span>
+        <strong>{{ stats.total_categories }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>Visible Now</span>
+        <strong>{{ links|length }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>Last Added</span>
+        <strong class="text-small">{{ stats.last_link }}</strong>
+    </div>
+</section>
+
+<section id="add-link" class="card">
+    <div class="card-head">
+        <div>
+            <h2>{% if edit_link %}Update Link{% else %}Add New Link{% endif %}</h2>
+            <p>Add links like material data sheets, codes, reports, Google Drive files, GitHub repositories, or useful references.</p>
+        </div>
+    </div>
+
+    <form action="{{ url_for('save_link') }}" method="POST" class="form-grid">
+        <input type="hidden" name="link_id" value="{{ edit_link.id if edit_link else '' }}">
+
+        <div class="field">
+            <label>Link Title</label>
+            <input
+                type="text"
+                name="title"
+                required
+                value="{{ edit_link.title if edit_link else '' }}"
+                placeholder="Example: Sika Repair Mortar Data Sheet"
+            >
+        </div>
+
+        <div class="field">
+            <label>Category</label>
+            <input
+                list="category-options"
+                type="text"
+                name="category"
+                required
+                value="{{ edit_link.category if edit_link else '' }}"
+                placeholder="Materials / Codes / Reports / GitHub"
+            >
+
+            <datalist id="category-options">
+                {% for c in categories %}
+                    <option value="{{ c }}">
+                {% endfor %}
+            </datalist>
+        </div>
+
+        <div class="field wide">
+            <label>URL / Hyperlink</label>
+            <input
+                type="text"
+                name="url"
+                required
+                value="{{ edit_link.url if edit_link else '' }}"
+                placeholder="https://example.com/file.pdf"
+            >
+        </div>
+
+        <div class="field wide">
+            <label>Tags</label>
+            <input
+                type="text"
+                name="tags"
+                value="{{ edit_link.tags if edit_link else '' }}"
+                placeholder="Example: epoxy, concrete repair, waterproofing"
+            >
+        </div>
+
+        <div class="field wide">
+            <label>Description / Notes</label>
+            <textarea
+                name="description"
+                rows="3"
+                placeholder="Optional notes for this link"
+            >{{ edit_link.description if edit_link else '' }}</textarea>
+        </div>
+
+        <div class="actions wide">
+            <button type="submit" class="btn primary">
+                {% if edit_link %}Update Link{% else %}Add Link{% endif %}
+            </button>
+
+            {% if edit_link %}
+                <a href="{{ url_for('index') }}" class="btn muted">Cancel Edit</a>
+            {% endif %}
+        </div>
+    </form>
+</section>
+
+<section id="filter-links" class="card">
+    <div class="card-head">
+        <div>
+            <h2>Search / Choose One or More Categories</h2>
+            <p>You can choose multiple categories using the checkboxes, or type several keywords separated by - , / ; مثل: concrete - aramco - datasheet.</p>
+        </div>
+    </div>
+
+    <form method="GET" action="{{ url_for('index') }}" class="multi-filter-form">
+        <div class="field wide-field">
+            <label>Search by title / category / tags / notes / URL</label>
+            <input
+                type="text"
+                name="search"
+                value="{{ search }}"
+                placeholder="Example: concrete repair - datasheet"
+            >
+        </div>
+
+        <div class="type-check-grid">
+            {% for c in categories %}
+                <label class="type-check {% if c in selected_categories %}checked{% endif %}">
+                    <input
+                        type="checkbox"
+                        name="categories"
+                        value="{{ c }}"
+                        {% if c in selected_categories %}checked{% endif %}
+                    >
+
+                    <span>{{ c }}</span>
+
+                    {% for category_name, count in stats.category_rows %}
+                        {% if category_name == c %}
+                            <b>{{ count }}</b>
+                        {% endif %}
+                    {% endfor %}
+                </label>
+            {% else %}
+                <div class="empty">No categories yet. Add your first link.</div>
+            {% endfor %}
+        </div>
+
+        <div class="actions filter-actions">
+            <button class="btn primary" type="submit">Search / Browse Links</button>
+            <a class="btn muted" href="{{ url_for('index') }}">Reset</a>
+        </div>
+    </form>
+</section>
+
+<section id="links-list" class="card">
+    <div class="section-head">
+        <div>
+            <h2>Links Database</h2>
+
+            {% if selected_categories or search_terms %}
+                <p>
+                    {% if selected_categories %}
+                        Selected categories:
+                        {% for c in selected_categories %}
+                            <strong class="inline-chip">{{ c }}</strong>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if search_terms %}
+                        Search terms:
+                        {% for term in search_terms %}
+                            <strong class="inline-chip">{{ term }}</strong>
+                        {% endfor %}
+                    {% endif %}
+                </p>
+            {% else %}
+                <p>Showing all saved links. Use category filters or search to narrow the list.</p>
+            {% endif %}
+        </div>
+
+        <span class="count-badge">{{ links|length }} link(s)</span>
+    </div>
+
+    {% if links %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Hyperlink</th>
+                        <th>Tags</th>
+                        <th>Notes</th>
+                        <th>Added</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for link in links %}
+                    <tr>
+                        <td><strong>{{ link.title }}</strong></td>
+                        <td>{{ link.category }}</td>
+                        <td>
+                            <a href="{{ url_for('open_link', link_id=link.id) }}" target="_blank">
+                                {{ link.short_url }}
+                            </a>
+                        </td>
+                        <td class="notes">{{ link.tags or '-' }}</td>
+                        <td class="notes">{{ link.description or '-' }}</td>
+                        <td>{{ link.created_at.strftime('%Y-%m-%d') if link.created_at else '-' }}</td>
+                        <td class="row-actions">
+                            <a class="btn success small" href="{{ url_for('open_link', link_id=link.id) }}" target="_blank">Open</a>
+                            <a class="btn small" href="{{ url_for('edit_link', link_id=link.id) }}">Edit</a>
+                            <a
+                                class="btn danger small"
+                                href="{{ url_for('delete_link', link_id=link.id) }}"
+                                onclick="return confirm('Delete this link?');"
+                            >
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🔗</div>
+            <h3>No links found</h3>
+            <p>Add your first link from the form above, or reset the filter.</p>
+        </div>
+    {% endif %}
+</section>
+
+{% endblock %}
