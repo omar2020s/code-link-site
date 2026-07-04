@@ -1,0 +1,275 @@
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #0d1628;
+    --card: #111b2d;
+    --line: #26354d;
+    --input: #040918;
+    --text: #e7eefb;
+    --muted: #9fb0c7;
+    --blue: #0ea5e9;
+    --blue-dark: #0284c7;
+    --green: #16a34a;
+    --red: #dc2626;
+    --gray: #64748b;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100vh;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #0d1628;
+    color: var(--text);
+    border-top: 1px solid #0ea5e9;
+}
+
+.page {
+    width: min(1050px, calc(100% - 36px));
+    margin: 20px auto 60px;
+}
+
+.card {
+    background: rgba(17, 27, 45, 0.96);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 18px;
+}
+
+h2 {
+    margin: 0 0 16px;
+    color: #68b7ff;
+    font-size: 18px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    align-items: start;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.field.wide {
+    grid-column: span 2;
+}
+
+label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #eef6ff;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    background: var(--input);
+    border: 1px solid #33435c;
+    color: #eef6ff;
+    border-radius: 8px;
+    padding: 9px 10px;
+    font-size: 12px;
+    outline: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #7f8da3;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.12);
+}
+
+textarea {
+    min-height: 56px;
+    resize: vertical;
+}
+
+.actions {
+    grid-column: 1 / -1;
+    margin-top: 2px;
+    display: flex;
+    gap: 8px;
+}
+
+.btn {
+    border: 0;
+    border-radius: 8px;
+    padding: 9px 14px;
+    color: white;
+    background: var(--gray);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn.primary {
+    background: var(--blue);
+}
+
+.btn.success {
+    background: var(--green);
+}
+
+.btn.danger {
+    background: var(--red);
+}
+
+.btn.muted {
+    background: var(--gray);
+}
+
+.btn.small {
+    padding: 7px 9px;
+    font-size: 11px;
+}
+
+.filter-row {
+    display: grid;
+    grid-template-columns: 1fr 170px auto auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.section-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.section-title-row span {
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+}
+
+.table-wrap {
+    overflow-x: auto;
+    border-bottom: 1px solid #223148;
+    padding-bottom: 18px;
+}
+
+table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+}
+
+th {
+    background: #0d91c9;
+    color: white;
+    font-size: 12px;
+    padding: 9px;
+    text-align: center;
+}
+
+td {
+    color: #dbe7f7;
+    font-size: 12px;
+    padding: 12px 9px;
+    text-align: center;
+    border-bottom: 1px solid #1d2a3d;
+    vertical-align: middle;
+}
+
+a {
+    color: #67d4ff;
+}
+
+.notes {
+    max-width: 260px;
+    white-space: normal;
+    text-align: left;
+}
+
+.row-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.empty,
+.empty-state {
+    color: #a9bad1;
+    text-align: center;
+    padding: 22px;
+    font-size: 13px;
+}
+
+.alerts {
+    margin-bottom: 14px;
+}
+
+.alert {
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.alert.success {
+    background: #064e3b;
+    color: #d1fae5;
+}
+
+.alert.danger {
+    background: #7f1d1d;
+    color: #fee2e2;
+}
+
+.alert.warning {
+    background: #78350f;
+    color: #fef3c7;
+}
+
+.center {
+    text-align: center;
+}
+
+@media (max-width: 900px) {
+    .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .filter-row {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 650px) {
+    .page {
+        width: calc(100% - 20px);
+        margin-top: 10px;
+    }
+
+    .form-grid,
+    .filter-row {
+        grid-template-columns: 1fr;
+    }
+
+    .field.wide {
+        grid-column: span 1;
+    }
+}
