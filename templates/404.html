@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}غير موجود{% endblock %}
+
+{% block content %}
+<section class="card center">
+  <h1>اللينك غير موجود</h1>
+  <p class="muted">الكود المطلوب غير موجود أو اللينك خطأ.</p>
+  <a class="btn-secondary" href="{{ url_for('index') }}">العودة للرئيسية</a>
+</section>
+{% endblock %}
