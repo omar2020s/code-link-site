@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}إنشاء حساب{% endblock %}
+{% block content %}
+<section class="auth-shell">
+    <div class="auth-card wide-auth">
+        <span class="eyebrow">خطوة واحدة قبل الاشتراك</span>
+        <h1>إنشاء حساب جديد</h1>
+        <form method="post" class="stack-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label>الاسم
+                <input type="text" name="name" required minlength="2" maxlength="120" autocomplete="name">
+            </label>
+            <label>البريد الإلكتروني
+                <input type="email" name="email" required autocomplete="email">
+            </label>
+            <div class="two-cols">
+                <label>كلمة المرور
+                    <input type="password" name="password" required minlength="8" autocomplete="new-password">
+                </label>
+                <label>تأكيد كلمة المرور
+                    <input type="password" name="password_confirm" required minlength="8" autocomplete="new-password">
+                </label>
+            </div>
+            <button class="btn primary full large" type="submit">إنشاء الحساب</button>
+        </form>
+        <p class="muted-text">بإنشاء الحساب فإنك توافق على <a href="{{ url_for('terms') }}">الشروط</a> و<a href="{{ url_for('privacy') }}">سياسة الخصوصية</a>.</p>
+    </div>
+</section>
+{% endblock %}

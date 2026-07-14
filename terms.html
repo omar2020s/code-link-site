@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}مكتبة الروابط{% endblock %}
+{% block content %}
+<section class="page-heading">
+    <div>
+        <span class="eyebrow">المحتوى المحمي</span>
+        <h1>مكتبة المراجع والروابط</h1>
+        <p>ابحث بالعنوان أو التصنيف أو الكلمات المفتاحية أو الملاحظات.</p>
+    </div>
+    <div class="stats-row">
+        <div class="mini-stat"><strong>{{ stats.total_links }}</strong><span>رابط</span></div>
+        <div class="mini-stat"><strong>{{ stats.total_categories }}</strong><span>تصنيف</span></div>
+    </div>
+</section>
+
+{% if current_user.is_admin %}
+<section id="add-link" class="card">
+    <h2>{% if edit_link %}تعديل الرابط{% else %}إضافة رابط جديد{% endif %}</h2>
+    <form action="{{ url_for('save_link') }}" method="post" class="form-grid">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="link_id" value="{{ edit_link.id if edit_link else '' }}">
+        <div class="field"><label>العنوان</label><input type="text" name="title" required value="{{ edit_link.title if edit_link else '' }}" placeholder="مثال: Data Sheet"></div>
+        <div class="field"><label>التصنيف</label><input list="category-options" type="text" name="category" required value="{{ edit_link.category if edit_link else '' }}" placeholder="مواد / أكواد / تقارير"><datalist id="category-options">{% for c in categories %}<option value="{{ c }}">{% endfor %}</datalist></div>
+        <div class="field"><label>الكلمات المفتاحية</label><input type="text" name="tags" value="{{ edit_link.tags if edit_link else '' }}" placeholder="epoxy / concrete / aramco"></div>
+        <div class="field"><label>الرابط</label><input type="url" name="url" required value="{{ edit_link.url if edit_link else '' }}" placeholder="https://example.com/file.pdf"></div>
+        <div class="field wide"><label>ملاحظات اختيارية</label><textarea name="notes" rows="3">{{ edit_link.notes if edit_link else '' }}</textarea></div>
+        <div class="actions"><button type="submit" class="btn primary">{% if edit_link %}حفظ التعديل{% else %}إضافة الرابط{% endif %}</button>{% if edit_link %}<a href="{{ url_for('library') }}" class="btn muted">إلغاء</a>{% endif %}</div>
+    </form>
+</section>
+{% endif %}
+
+<section class="card">
+    <h2>البحث والتصفية</h2>
+    <form method="get" action="{{ url_for('library') }}" class="filter-row">
+        <input type="text" name="search" value="{{ search }}" placeholder="ابحث بالعنوان أو الكلمات المفتاحية أو الرابط">
+        <select name="category"><option value="">كل التصنيفات</option>{% for c in categories %}<option value="{{ c }}" {% if selected_category == c %}selected{% endif %}>{{ c }}</option>{% endfor %}</select>
+        <button class="btn primary" type="submit">بحث</button>
+        <a class="btn muted" href="{{ url_for('library') }}">إعادة ضبط</a>
+    </form>
+</section>
+
+<section class="card">
+    <div class="section-title-row"><h2>قاعدة الروابط</h2><span>{{ links|length if table_ready else 0 }} نتيجة</span></div>
+    {% if not table_ready %}
+        <div class="empty-state">اختر تصنيفًا أو اكتب كلمة بحث لإظهار المحتوى.</div>
+    {% else %}
+        <div class="table-wrap"><table>
+            <thead><tr><th>العنوان</th><th>التصنيف</th><th>الكلمات المفتاحية</th><th>الرابط</th><th>الملاحظات</th><th>الإجراءات</th></tr></thead>
+            <tbody>
+            {% for link in links %}
+                <tr>
+                    <td><strong>{{ link.title }}</strong></td><td>{{ link.category }}</td><td>{{ link.tags or '-' }}</td>
+                    <td><a href="{{ url_for('open_link', link_id=link.id) }}" target="_blank" rel="noopener">{{ link.short_url }}</a></td>
+                    <td class="notes">{{ link.notes or '-' }}</td>
+                    <td class="row-actions">
+                        <a class="btn success small" href="{{ url_for('open_link', link_id=link.id) }}" target="_blank" rel="noopener">فتح</a>
+                        {% if current_user.is_admin %}
+                            <a class="btn small" href="{{ url_for('edit_link', link_id=link.id) }}">تعديل</a>
+                            <form action="{{ url_for('delete_link', link_id=link.id) }}" method="post" onsubmit="return confirm('حذف هذا الرابط؟');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn danger small" type="submit">حذف</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}<tr><td colspan="6" class="empty">لا توجد نتائج.</td></tr>{% endfor %}
+            </tbody>
+        </table></div>
+    {% endif %}
+</section>
+{% endblock %}
