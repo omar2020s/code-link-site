@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Mada Payment — {{ plan.name }}{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="https://cdn.moyasar.com/mpf/{{ form_version }}/moyasar.css">
+{% endblock %}
+{% block content %}
+<section class="checkout-layout">
+    <div class="card checkout-summary">
+        <span class="eyebrow">Order Summary</span>
+        <h1>{{ plan.name }}</h1>
+        <div class="summary-line"><span>Subscription Period</span><strong>{{ plan.days }} days</strong></div>
+        <div class="summary-line"><span>Payment Network</span><strong>Mada</strong></div>
+        <div class="summary-line total"><span>Total</span><strong>{{ money_sar(plan.price_halalas) }}</strong></div>
+        <p class="muted-text">After completing the Mada payment and any required 3-D Secure verification, you will return automatically. Access is activated only after the server verifies the transaction.</p>
+        <a href="{{ url_for('subscribe') }}">Back to subscription plans</a>
+    </div>
+    <div class="card payment-card">
+        <div class="payment-heading">
+            <div>
+                <span class="eyebrow">Secure card payment</span>
+                <h2>Pay with a Saudi Mada Card</h2>
+            </div>
+            <div class="mada-logo-text">mada</div>
+        </div>
+        <div class="mysr-form"></div>
+        <p class="payment-footnote">The payment form is provided by Moyasar. This website never receives or stores your full card number or security code.</p>
+    </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.moyasar.com/mpf/{{ form_version }}/moyasar.js"></script>
+<script>
+window.Moyasar.init({
+    element: '.mysr-form',
+    language: 'en',
+    amount: {{ plan.price_halalas }},
+    currency: 'SAR',
+    description: {{ ('Mada subscription ' ~ plan.code ~ ' - user ' ~ current_user.id)|tojson }},
+    publishable_api_key: {{ publishable_key|tojson }},
+    callback_url: {{ callback_url|tojson }},
+    methods: ['creditcard'],
+    supported_networks: ['mada'],
+    fixed_width: false,
+    metadata: {
+        user_id: {{ current_user.id|string|tojson }},
+        plan_code: {{ plan.code|tojson }},
+        checkout_token: {{ pending.token|tojson }}
+    }
+});
+</script>
+{% endblock %}
