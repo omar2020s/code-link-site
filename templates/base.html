@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="مكتبة روابط ومراجع هندسية بنظام اشتراك مدفوع">
+    <title>{% block title %}مكتبة المراجع{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" href="{{ url_for('landing') }}">
+        <span class="brand-mark">Q</span>
+        <span>مكتبة الجودة</span>
+    </a>
+
+    <nav class="nav-links">
+        {% if current_user.is_authenticated %}
+            {% if current_user.has_active_subscription %}
+                <a href="{{ url_for('library') }}">المكتبة</a>
+            {% endif %}
+            <a href="{{ url_for('subscribe') }}">الاشتراك</a>
+            <a href="{{ url_for('account') }}">حسابي</a>
+            {% if current_user.is_admin %}
+                <a href="{{ url_for('admin_users') }}">الإدارة</a>
+            {% endif %}
+            <form action="{{ url_for('logout') }}" method="post" class="inline-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="nav-button" type="submit">خروج</button>
+            </form>
+        {% else %}
+            <a href="{{ url_for('login') }}">تسجيل الدخول</a>
+            <a class="nav-cta" href="{{ url_for('register') }}">إنشاء حساب</a>
+        {% endif %}
+    </nav>
+</header>
+
+<main class="page">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alerts">
+                {% for category, message in messages %}
+                    <div class="alert {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="footer">
+    <span>© {{ now_utc.year }} مكتبة الجودة</span>
+    <span><a href="{{ url_for('terms') }}">الشروط</a> · <a href="{{ url_for('privacy') }}">الخصوصية</a></span>
+</footer>
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,1 @@
+{% extends "base.html" %}{% block title %}غير مصرح{% endblock %}{% block content %}<section class="card center error-card"><h1>403</h1><h2>غير مصرح لك بتنفيذ هذا الإجراء</h2><a class="btn primary" href="{{ url_for('landing') }}">العودة</a></section>{% endblock %}

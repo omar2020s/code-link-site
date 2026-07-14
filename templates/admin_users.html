@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}إدارة المستخدمين{% endblock %}
+{% block content %}
+<section class="page-heading"><div><span class="eyebrow">لوحة الإدارة</span><h1>المستخدمون والاشتراكات</h1><p>تفعيل يدوي، إلغاء اشتراك، وإيقاف الحسابات.</p></div></section>
+<section class="card">
+    <form class="filter-row admin-search" method="get"><input name="search" value="{{ search }}" placeholder="ابحث بالاسم أو البريد"><button class="btn primary">بحث</button><a class="btn muted" href="{{ url_for('admin_users') }}">إعادة ضبط</a></form>
+</section>
+<section class="card">
+    <div class="section-title-row"><h2>الحسابات</h2><span>{{ users|length }} مستخدم</span></div>
+    <div class="table-wrap"><table class="admin-table">
+        <thead><tr><th>المستخدم</th><th>الصلاحية</th><th>حالة الحساب</th><th>الاشتراك</th><th>الانتهاء</th><th>إجراءات</th></tr></thead>
+        <tbody>{% for user in users %}<tr>
+            <td><strong>{{ user.name }}</strong><br><small>{{ user.email }}</small></td>
+            <td>{% if user.is_admin %}<span class="pill warning">مدير</span>{% else %}مشترك{% endif %}</td>
+            <td><span class="pill {% if user.account_enabled %}success{% else %}danger{% endif %}">{% if user.account_enabled %}مفعل{% else %}موقوف{% endif %}</span></td>
+            <td>{% if user.has_active_subscription %}<span class="pill success">ساري</span>{% else %}<span class="pill danger">غير ساري</span>{% endif %}</td>
+            <td>{{ user.subscription_end.strftime('%Y-%m-%d') if user.subscription_end else '-' }}</td>
+            <td class="row-actions admin-actions">
+                <form action="{{ url_for('admin_activate_user', user_id=user.id) }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input class="days-input" type="number" name="days" value="30" min="1" max="3650"><button class="btn success small">تفعيل</button></form>
+                {% if not user.is_admin %}<form action="{{ url_for('admin_revoke_user', user_id=user.id) }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn danger small">إلغاء الاشتراك</button></form>{% endif %}
+                {% if user.id != current_user.id %}<form action="{{ url_for('admin_toggle_user', user_id=user.id) }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn muted small">{% if user.account_enabled %}إيقاف{% else %}تشغيل{% endif %}</button></form>{% endif %}
+            </td>
+        </tr>{% endfor %}</tbody>
+    </table></div>
+</section>
+<section class="card">
+    <div class="section-title-row"><h2>آخر المدفوعات</h2><span>{{ payments|length }} عملية</span></div>
+    <div class="table-wrap"><table><thead><tr><th>المستخدم</th><th>رقم العملية</th><th>الخطة</th><th>المبلغ</th><th>التاريخ</th></tr></thead><tbody>
+    {% for payment in payments %}<tr><td>{{ payment.user.email }}</td><td class="mono">{{ payment.provider_payment_id }}</td><td>{{ payment.plan_code }}</td><td>{{ money_sar(payment.amount_halalas) }}</td><td>{{ payment.created_at.strftime('%Y-%m-%d %H:%M') }}</td></tr>{% else %}<tr><td colspan="5" class="empty">لا توجد مدفوعات.</td></tr>{% endfor %}
+    </tbody></table></div>
+</section>
+{% endblock %}
