@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% block title %}BuildQuality Library — Codes, Materials & QA/QC Resources{% endblock %}
+{% block content %}
+<div class="landing-shell">
+    <section class="landing-hero">
+        <div class="hero-glow hero-glow-one"></div>
+        <div class="hero-glow hero-glow-two"></div>
+        <div class="landing-container hero-layout">
+            <div class="landing-hero-copy">
+                <div class="hero-kicker"><span></span> The engineering quality library built for professionals</div>
+                <h1>Every quality reference.<br><em>One trusted library.</em></h1>
+                <p class="hero-lead">Access construction codes, material data sheets, QA/QC templates, method statements, test reports, and batch plant documents from one organized workspace.</p>
+                <div class="hero-cta-row">
+                    <a class="landing-btn landing-btn-primary" href="{{ url_for('register') }}">Start {{ free_trial_days }}-Day Free Trial <span>→</span></a>
+                    <a class="landing-btn landing-btn-secondary" href="{{ url_for('login') }}">Sign In</a>
+                </div>
+                <div class="hero-trust-row">
+                    <div><b>✓</b> No card required</div>
+                    <div><b>✓</b> Full library access</div>
+                    <div><b>✓</b> Secure Mada payment</div>
+                </div>
+                <div class="hero-proof">
+                    <div class="proof-avatars"><span>QA</span><span>QC</span><span>CE</span><span>+1k</span></div>
+                    <div><strong>Built for QA/QC professionals</strong><small>Organized, searchable, and always accessible</small></div>
+                </div>
+            </div>
+
+            <div class="hero-product-wrap">
+                <div class="hero-product-badge badge-one">✓ Verified resources</div>
+                <div class="hero-product-badge badge-two">⚡ Fast technical search</div>
+                <div class="product-window">
+                    <div class="product-window-bar">
+                        <div class="mini-brand"><span class="mini-bars"><i></i><i></i><i></i></span><b>BuildQuality</b></div>
+                        <div class="window-search">Search codes, materials, templates... <span>⌕</span></div>
+                        <div class="window-avatar">OM</div>
+                    </div>
+                    <div class="product-window-body">
+                        <aside class="window-sidebar">
+                            <div class="window-nav active">▤ <span>Dashboard</span></div>
+                            <div class="window-nav">▥ <span>Codes</span></div>
+                            <div class="window-nav">◇ <span>Materials</span></div>
+                            <div class="window-nav">▣ <span>Templates</span></div>
+                            <div class="window-nav">⚗ <span>Test Reports</span></div>
+                        </aside>
+                        <div class="window-main">
+                            <div class="window-greeting"><div><small>QUALITY LIBRARY</small><strong>Good morning, Engineer</strong></div><button>+ Add Resource</button></div>
+                            <div class="window-metrics">
+                                <div><span class="metric-icon blue">▤</span><p>Codes</p><b>512</b></div>
+                                <div><span class="metric-icon purple">◇</span><p>Materials</p><b>846</b></div>
+                                <div><span class="metric-icon orange">▣</span><p>Templates</p><b>428</b></div>
+                            </div>
+                            <div class="window-panels">
+                                <div class="window-panel wide">
+                                    <div class="window-panel-title"><b>Featured Resources</b><span>View all</span></div>
+                                    <div class="mock-resource"><i class="pdf">PDF</i><div><b>ACI 318-19 Building Code</b><small>Structural concrete requirements</small></div><button>Open</button></div>
+                                    <div class="mock-resource"><i class="doc">DOC</i><div><b>Concrete Pouring Method</b><small>Approved method statement</small></div><button>Open</button></div>
+                                    <div class="mock-resource"><i class="xls">XLS</i><div><b>Material Cost Calculator</b><small>Quantity and cost estimation</small></div><button>Open</button></div>
+                                </div>
+                                <div class="window-panel">
+                                    <div class="window-panel-title"><b>Library Status</b></div>
+                                    <div class="ring-chart"><span>2,846<small>Resources</small></span></div>
+                                    <div class="chart-legend"><span><i></i> Codes</span><span><i></i> Materials</span><span><i></i> Reports</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="trusted-strip">
+        <div class="landing-container trusted-inner">
+            <span>RESOURCE CATEGORIES</span>
+            <div>ACI</div><div>ASTM</div><div>BS EN</div><div>SBC</div><div>ISO</div><div>MATERIAL DATA</div>
+        </div>
+    </section>
+
+    <section class="landing-section">
+        <div class="landing-container">
+            <div class="section-heading centered">
+                <span class="section-kicker">EVERYTHING IN ONE PLACE</span>
+                <h2>A complete technical library for construction quality</h2>
+                <p>Stop searching through scattered folders and old messages. Find the right technical resource in seconds.</p>
+            </div>
+            <div class="category-card-grid">
+                <a href="{{ url_for('register') }}" class="category-card category-blue"><div class="category-icon">▤</div><h3>Codes & Standards</h3><p>ACI, ASTM, BS EN, SBC, ISO and other engineering references.</p><span>Browse codes →</span></a>
+                <a href="{{ url_for('register') }}" class="category-card category-purple"><div class="category-icon">◇</div><h3>Materials Library</h3><p>Datasheets, consumption rates, unit prices, approvals, and certificates.</p><span>Browse materials →</span></a>
+                <a href="{{ url_for('register') }}" class="category-card category-orange"><div class="category-icon">▣</div><h3>Quality Templates</h3><p>Ready-to-use ITPs, checklists, forms, logs, and QA/QC plans.</p><span>Browse templates →</span></a>
+                <a href="{{ url_for('register') }}" class="category-card category-cyan"><div class="category-icon">▧</div><h3>Method Statements</h3><p>Professional execution procedures for civil and construction activities.</p><span>Browse methods →</span></a>
+                <a href="{{ url_for('register') }}" class="category-card category-green"><div class="category-icon">⚗</div><h3>Test Reports</h3><p>Concrete, soil, steel, asphalt, and laboratory test report references.</p><span>Browse reports →</span></a>
+                <a href="{{ url_for('register') }}" class="category-card category-red"><div class="category-icon">♜</div><h3>Batch Plant</h3><p>Mix designs, calibrations, approvals, and compliance documents.</p><span>Browse documents →</span></a>
+            </div>
+        </div>
+    </section>
+
+    <section class="landing-section feature-section">
+        <div class="landing-container feature-layout">
+            <div class="feature-visual">
+                <div class="search-demo-card">
+                    <div class="search-demo-top"><span>Search the library</span><b>⌕</b></div>
+                    <div class="search-demo-query">epoxy grout <span>×</span></div>
+                    <div class="search-demo-results">
+                        <div><i class="pdf">PDF</i><span><b>Epoxy Grout Technical Datasheet</b><small>Materials · Updated recently</small></span><em>Open</em></div>
+                        <div><i class="doc">DOC</i><span><b>Epoxy Grouting Method Statement</b><small>Method Statement · Approved</small></span><em>Open</em></div>
+                        <div><i class="xls">XLS</i><span><b>Epoxy Grout Quantity Calculator</b><small>Materials · Cost estimation</small></span><em>Open</em></div>
+                    </div>
+                    <div class="search-demo-footer">3 matching resources found in 0.08 seconds</div>
+                </div>
+            </div>
+            <div class="feature-copy">
+                <span class="section-kicker">SEARCH LESS. BUILD BETTER.</span>
+                <h2>Find the exact resource you need in seconds</h2>
+                <p>Search across titles, categories, tags, notes, and technical links. Every resource is organized for fast engineering use.</p>
+                <div class="feature-list">
+                    <div><span>01</span><div><b>Powerful unified search</b><small>Search all library sections from one field.</small></div></div>
+                    <div><span>02</span><div><b>Material quantity calculator</b><small>Calculate required quantities and total cost using area, consumption rate, and price.</small></div></div>
+                    <div><span>03</span><div><b>Controlled content management</b><small>Only administrators can add, edit, or delete resources.</small></div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="landing-section numbers-section">
+        <div class="landing-container numbers-grid">
+            <div><strong>2,800+</strong><span>Technical resources</span></div>
+            <div><strong>6</strong><span>Specialized libraries</span></div>
+            <div><strong>{{ free_trial_days }} Days</strong><span>Full free access</span></div>
+            <div><strong>24/7</strong><span>Cloud availability</span></div>
+        </div>
+    </section>
+
+    <section class="landing-section pricing-section" id="pricing">
+        <div class="landing-container">
+            <div class="section-heading centered">
+                <span class="section-kicker">SIMPLE PRICING</span>
+                <h2>Start free. Subscribe when you are ready.</h2>
+                <p>Full access during your trial. Continue securely using a Saudi Mada card through Moyasar.</p>
+            </div>
+            <div class="landing-pricing-grid">
+                {% for key, plan in plans.items() %}
+                <article class="landing-price-card {% if loop.last %}recommended{% endif %}">
+                    {% if loop.last %}<div class="recommended-label">BEST VALUE</div>{% endif %}
+                    <div class="price-card-head"><span>{{ plan.badge }}</span><h3>{{ plan.name }}</h3></div>
+                    <div class="landing-price"><strong>{{ money_sar(plan.price_halalas) }}</strong><small>/ {{ 'year' if plan.days > 100 else 'month' }}</small></div>
+                    <p>Complete access to every library section and all calculator features.</p>
+                    <ul>
+                        <li>✓ Full codes and standards library</li>
+                        <li>✓ Materials data and cost calculator</li>
+                        <li>✓ Templates, methods, and test reports</li>
+                        <li>✓ Secure Saudi Mada payment</li>
+                        <li>✓ Unused access time is preserved</li>
+                    </ul>
+                    <a class="landing-btn {% if loop.last %}landing-btn-primary{% else %}landing-btn-outline{% endif %}" href="{{ url_for('register') }}">Start Free Trial</a>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="landing-section faq-section">
+        <div class="landing-container faq-layout">
+            <div class="faq-intro"><span class="section-kicker">QUESTIONS & ANSWERS</span><h2>Everything you need to know</h2><p>Clear answers about access, trial periods, subscriptions, and content management.</p></div>
+            <div class="faq-list">
+                <details open><summary>What happens during the {{ free_trial_days }}-day trial?<span>+</span></summary><p>You receive full access to all protected library sections and tools. No payment card is required to start.</p></details>
+                <details><summary>What happens when the free trial ends?<span>+</span></summary><p>Library access is paused until you activate a monthly or annual subscription.</p></details>
+                <details><summary>Which payment method is accepted?<span>+</span></summary><p>The system accepts Saudi Mada cards securely through Moyasar and verifies the payment on the server.</p></details>
+                <details><summary>Who can add or edit library resources?<span>+</span></summary><p>Only the administrator can create, update, or delete resources. Subscribers have read, search, open, and calculation access.</p></details>
+            </div>
+        </div>
+    </section>
+
+    <section class="final-cta">
+        <div class="landing-container final-cta-inner">
+            <div><span>READY TO ORGANIZE YOUR TECHNICAL WORK?</span><h2>Start using BuildQuality Library today.</h2><p>Get complete access for {{ free_trial_days }} days. No card required.</p></div>
+            <a class="landing-btn landing-btn-white" href="{{ url_for('register') }}">Start Free Trial <span>→</span></a>
+        </div>
+    </section>
+
+    <footer class="landing-footer">
+        <div class="landing-container footer-grid">
+            <div class="footer-brand"><div class="footer-logo"><span class="mini-bars"><i></i><i></i><i></i></span><b>BuildQuality</b></div><p>Professional construction quality references, materials, templates, and technical tools in one secure digital library.</p></div>
+            <div><b>Library</b><a href="{{ url_for('register') }}">Codes</a><a href="{{ url_for('register') }}">Materials</a><a href="{{ url_for('register') }}">Templates</a><a href="{{ url_for('register') }}">Test Reports</a></div>
+            <div><b>Account</b><a href="{{ url_for('login') }}">Sign In</a><a href="{{ url_for('register') }}">Start Free Trial</a><a href="#pricing">Pricing</a></div>
+            <div><b>Legal</b><a href="{{ url_for('terms') }}">Terms</a><a href="{{ url_for('privacy') }}">Privacy</a></div>
+        </div>
+        <div class="landing-container footer-bottom"><span>© 2026 BuildQuality Library. All rights reserved.</span><span>Secure subscription access · Saudi Mada payments</span></div>
+    </footer>
+</div>
+{% endblock %}
