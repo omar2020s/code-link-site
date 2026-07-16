@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Start Free Trial{% endblock %}
+{% block content %}
+<section class="auth-shell">
+    <div class="auth-card wide-auth">
+        <span class="eyebrow">No payment required to begin</span>
+        <h1>Start Your {{ free_trial_days }}-Day Free Trial</h1>
+        <p class="muted-text">Your trial starts immediately after registration and gives you full access to the protected library. A paid subscription is required after it expires.</p>
+        <form method="post" class="stack-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label>Full Name
+                <input type="text" name="name" required minlength="2" maxlength="120" autocomplete="name">
+            </label>
+            <label>Email Address
+                <input type="email" name="email" required autocomplete="email">
+            </label>
+            <div class="two-cols">
+                <label>Password
+                    <input type="password" name="password" required minlength="8" autocomplete="new-password">
+                </label>
+                <label>Confirm Password
+                    <input type="password" name="password_confirm" required minlength="8" autocomplete="new-password">
+                </label>
+            </div>
+            <button class="btn primary full large" type="submit">Create Account and Start Free Trial</button>
+        </form>
+        <p class="muted-text">By creating an account, you agree to the <a href="{{ url_for('terms') }}">Terms and Conditions</a> and <a href="{{ url_for('privacy') }}">Privacy Policy</a>.</p>
+    </div>
+</section>
+{% endblock %}

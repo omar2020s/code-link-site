@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Quality Library | BuildQuality{% endblock %}
+{% block content %}
+<div class="library-heading">
+    <div><h1>{% if selected_category %}{{ selected_category }} Library{% elif search %}Search Results{% else %}Quality Library{% endif %}</h1><p>{% if selected_category %}Browse and open verified {{ selected_category|lower }} resources.{% elif search %}Results for “{{ search }}”.{% else %}Browse standards, materials, templates, statements, and test resources.{% endif %}</p></div>
+    {% if current_user.is_admin %}<button class="btn btn-primary" onclick="document.getElementById('admin-editor').classList.toggle('hidden')">＋ Add Resource</button>{% endif %}
+</div>
+
+{% if current_user.is_admin %}
+<section id="admin-editor" class="admin-editor {% if not edit_link %}hidden{% endif %}">
+    <div class="editor-title"><div><span>Administrator tools</span><h2>{% if edit_link %}Edit Resource{% else %}Add New Resource{% endif %}</h2></div><button type="button" class="icon-close" onclick="this.closest('.admin-editor').classList.add('hidden')">×</button></div>
+    <form method="post" action="{{ url_for('save_link') }}" class="editor-grid">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="link_id" value="{{ edit_link.id if edit_link else '' }}">
+        <label>Resource Title<input name="title" value="{{ edit_link.title if edit_link else '' }}" required maxlength="220"></label>
+        <label>Library Category<select name="category" required>{% for c in categories %}<option value="{{ c }}" {% if (edit_link and edit_link.category == c) or (not edit_link and selected_category == c) %}selected{% endif %}>{{ c }}</option>{% endfor %}</select></label>
+        <label class="wide">Resource URL<input name="url" value="{{ edit_link.url if edit_link else '' }}" type="url" placeholder="https://..." required></label>
+        <label>Tags / File Type<input name="tags" value="{{ edit_link.tags if edit_link else '' }}" placeholder="PDF, TDS, epoxy"></label>
+        <label>Short Description<textarea name="notes" rows="2">{{ edit_link.notes if edit_link else '' }}</textarea></label>
+        <div class="material-fields wide" data-material-fields>
+            <div class="material-fields-title">Material Calculation Data <small>Required only when Library Category is Materials</small></div>
+            <div class="material-fields-grid">
+                <label>Material Type<input name="material_type" value="{{ edit_link.material_type if edit_link else '' }}" placeholder="Epoxy / PU / Acrylic / Cementitious"></label>
+                <label>Consumption Rate (kg/m²)<input type="number" min="0" step="0.0001" name="consumption_rate" value="{{ edit_link.consumption_rate if edit_link and edit_link.consumption_rate is not none else '' }}" placeholder="0.00"></label>
+                <label>Price per kg (SAR)<input type="number" min="0" step="0.01" name="price_per_kg" value="{{ edit_link.price_per_kg if edit_link and edit_link.price_per_kg is not none else '' }}" placeholder="0.00"></label>
+            </div>
+        </div>
+        <div class="editor-actions"><button class="btn btn-primary" type="submit">{% if edit_link %}Save Changes{% else %}Add Resource{% endif %}</button>{% if edit_link %}<a class="btn btn-light" href="{{ url_for('library', category=selected_category) }}">Cancel</a>{% endif %}</div>
+    </form>
+</section>
+{% endif %}
+
+{% if not browsing %}
+<section class="metric-grid">
+    <div class="metric-card total"><span class="metric-icon">▤</span><div><small>Total Resources</small><strong>{{ stats.total_links }}</strong><em>Across all libraries</em></div></div>
+    {% for category in library_categories[:5] %}{% set meta=category_meta[category] %}<a class="metric-card" href="{{ url_for('library', category=category) }}"><span class="metric-icon i{{ loop.index }}">{% if category=='Codes' %}▤{% elif category=='Materials' %}◇{% elif category=='Quality Document Template' %}▣{% elif category=='Method Statement' %}▧{% else %}⚗{% endif %}</span><div><small>{{ meta.short }}</small><strong>{{ category_counts.get(category,0) }}</strong><em>{{ meta.description }}</em></div></a>{% endfor %}
+</section>
+
+<section class="dashboard-grid top-row">
+    <article class="panel featured-panel"><div class="panel-head"><h2>Featured Resources</h2><a href="{{ url_for('library', search='') }}">View all</a></div>{% for item in featured %}<div class="resource-row"><div class="resource-thumb">{{ resource_file_type(item)[:1] }}</div><div class="resource-info"><strong>{{ item.title }}</strong><p>{{ item.notes or item.category }}</p><span class="file-badge">{{ resource_file_type(item) }}</span></div><a class="outline-btn" href="{{ url_for('open_link', link_id=item.id) }}" target="_blank">Open</a></div>{% else %}<div class="empty-card">No resources yet. The administrator can add the first resource.</div>{% endfor %}</article>
+    <article class="panel"><div class="panel-head"><h2>Popular Codes</h2><a href="{{ url_for('library', category='Codes') }}">View all</a></div>{% for item in popular_codes %}<div class="simple-resource"><span class="doc-symbol">▤</span><div><strong>{{ item.title }}</strong><small>{{ item.notes or 'Technical code reference' }}</small></div><span class="file-badge">{{ resource_file_type(item) }}</span><a class="outline-btn small" href="{{ url_for('open_link', link_id=item.id) }}" target="_blank">View</a></div>{% else %}<div class="empty-card">Codes added by the administrator will appear here.</div>{% endfor %}</article>
+    <article class="panel"><div class="panel-head"><h2>Recent Additions</h2><a href="{{ url_for('library', search='all') }}">View all</a></div>{% for item in recent %}<div class="simple-resource recent"><span class="file-square {{ resource_file_type(item)|lower }}">{{ resource_file_type(item)[:3] }}</span><div><strong>{{ item.title }}</strong><small>{{ item.created_at.strftime('%b %d, %Y') if item.created_at else '' }} · {{ item.category }}</small></div><a class="outline-btn small" href="{{ url_for('open_link', link_id=item.id) }}" target="_blank">Open</a></div>{% else %}<div class="empty-card">Recently added resources will appear here.</div>{% endfor %}</article>
+</section>
+
+<section class="category-dashboard">
+    <article class="panel category-list"><div class="panel-head"><h2>Resource Categories</h2></div>{% for category in library_categories %}<a href="{{ url_for('library', category=category) }}"><span>{{ category }}</span><strong>{{ category_counts.get(category,0) }} ›</strong></a>{% endfor %}</article>
+    {% for category in library_categories[2:] %}{% set meta=category_meta[category] %}<article class="panel category-preview"><div class="preview-title"><span class="preview-icon">{% if category=='Quality Document Template' %}▣{% elif category=='Method Statement' %}▧{% elif category=='Test Reports' %}⚗{% else %}♜{% endif %}</span><div><h2>{{ meta.short }} Library</h2><p>{{ meta.description }}</p></div></div><div class="preview-items">{% for item in category_previews[category] %}<div><span>{{ item.title }}</span><b>{{ resource_file_type(item) }}</b></div>{% else %}<div class="empty-small">No resources available.</div>{% endfor %}</div><div class="preview-footer"><strong>{{ category_counts.get(category,0) }} Resources</strong><a class="outline-btn" href="{{ url_for('library', category=category) }}">Browse</a></div></article>{% endfor %}
+</section>
+{% else %}
+<section class="browse-toolbar"><div class="result-count"><strong>{{ links|length }}</strong> resource(s) found</div><form method="get" action="{{ url_for('library') }}"><input type="search" name="search" value="{{ search }}" placeholder="Search this library"><select name="category"><option value="">All Categories</option>{% for c in categories %}<option value="{{ c }}" {% if selected_category==c %}selected{% endif %}>{{ c }}</option>{% endfor %}</select><button class="btn btn-primary">Search</button><a class="btn btn-light" href="{{ url_for('library') }}">Reset</a></form></section>
+{% if selected_category == 'Materials' %}
+<section class="materials-calculator-panel">
+    <div class="calculator-heading">
+        <div><h2>Materials Calculation</h2><p>Select one or more materials, enter the work area, and calculate required quantity and total cost.</p></div>
+        <div class="materials-count">{{ links|length }} material(s)</div>
+    </div>
+    <div class="calculator-controls">
+        <label>Area (m²)<input id="calc-area" type="number" min="0" step="0.01" placeholder="Enter area"></label>
+        <button type="button" class="btn btn-success" id="calculate-materials">Calculate</button>
+        <button type="button" class="btn btn-light" id="print-material-report">Print Report</button>
+    </div>
+    <div class="material-table-wrap">
+        <table class="material-table">
+            <thead><tr><th>Select</th><th>Material</th><th>Type</th><th>Consumption (kg/m²)</th><th>Price/kg (SAR)</th><th>Required Qty (kg)</th><th>Total Cost (SAR)</th><th>Data Sheet</th>{% if current_user.is_admin %}<th>Actions</th>{% endif %}</tr></thead>
+            <tbody>
+            {% for item in links %}
+                <tr class="material-row" data-rate="{{ item.consumption_rate or 0 }}" data-price="{{ item.price_per_kg or 0 }}">
+                    <td><input class="material-select" type="checkbox" aria-label="Select {{ item.title }}"></td>
+                    <td><strong>{{ item.title }}</strong><small>{{ item.notes or '' }}</small></td>
+                    <td>{{ item.material_type or '—' }}</td>
+                    <td>{{ '%.4f'|format(item.consumption_rate or 0) }}</td>
+                    <td>{{ '%.2f'|format(item.price_per_kg or 0) }}</td>
+                    <td class="required-qty">—</td>
+                    <td class="total-cost">—</td>
+                    <td><a class="outline-btn small" href="{{ url_for('open_link', link_id=item.id) }}" target="_blank">Open</a></td>
+                    {% if current_user.is_admin %}<td class="inline-actions"><a class="btn btn-light" href="{{ url_for('edit_link', link_id=item.id) }}">Edit</a><form method="post" action="{{ url_for('delete_link', link_id=item.id) }}" onsubmit="return confirm('Delete this material permanently?')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-danger">Delete</button></form></td>{% endif %}
+                </tr>
+            {% else %}<tr><td colspan="9" class="empty-table">No materials found. The administrator can add the first material.</td></tr>{% endfor %}
+            </tbody>
+            <tfoot><tr><td colspan="5"><strong>Selected Materials Total</strong></td><td id="grand-quantity">0.00 kg</td><td id="grand-cost">SAR 0.00</td><td colspan="2"></td></tr></tfoot>
+        </table>
+    </div>
+</section>
+{% else %}
+<section class="resource-catalog">{% for item in links %}<article class="catalog-card"><div class="catalog-icon">{{ resource_file_type(item)[:3] }}</div><div class="catalog-body"><div class="catalog-meta"><span>{{ item.category }}</span><b>{{ resource_file_type(item) }}</b></div><h2>{{ item.title }}</h2><p>{{ item.notes or 'Technical resource available to active subscribers.' }}</p><div class="tag-line">{{ item.tags or 'Quality Library' }}</div></div><div class="catalog-actions"><a class="btn btn-primary" href="{{ url_for('open_link', link_id=item.id) }}" target="_blank">Open Resource</a>{% if current_user.is_admin %}<a class="btn btn-light" href="{{ url_for('edit_link', link_id=item.id) }}">Edit</a><form method="post" action="{{ url_for('delete_link', link_id=item.id) }}" onsubmit="return confirm('Delete this resource permanently?')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-danger">Delete</button></form>{% endif %}</div></article>{% else %}<div class="empty-results"><span>⌕</span><h2>No matching resources</h2><p>Try another keyword or select a different library category.</p></div>{% endfor %}</section>
+{% endif %}
+{% endif %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const categorySelect = document.querySelector('select[name="category"]');
+    const materialFields = document.querySelector('[data-material-fields]');
+    function toggleMaterialFields() {
+        if (!categorySelect || !materialFields) return;
+        materialFields.classList.toggle('is-hidden', categorySelect.value !== 'Materials');
+        materialFields.querySelectorAll('input[name="consumption_rate"], input[name="price_per_kg"]').forEach(input => {
+            input.required = categorySelect.value === 'Materials';
+        });
+    }
+    if (categorySelect) { categorySelect.addEventListener('change', toggleMaterialFields); toggleMaterialFields(); }
+
+    const calculateButton = document.getElementById('calculate-materials');
+    function calculateMaterials() {
+        const areaInput = document.getElementById('calc-area');
+        const area = Number(areaInput?.value || 0);
+        if (!(area > 0)) { alert('Enter a valid work area greater than zero.'); areaInput?.focus(); return; }
+        let grandQty = 0, grandCost = 0, selected = 0;
+        document.querySelectorAll('.material-row').forEach(row => {
+            const checkbox = row.querySelector('.material-select');
+            const qtyCell = row.querySelector('.required-qty');
+            const costCell = row.querySelector('.total-cost');
+            if (checkbox?.checked) {
+                const rate = Number(row.dataset.rate || 0);
+                const price = Number(row.dataset.price || 0);
+                const qty = area * rate;
+                const cost = qty * price;
+                qtyCell.textContent = qty.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                costCell.textContent = cost.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                grandQty += qty; grandCost += cost; selected += 1;
+            } else { qtyCell.textContent = '—'; costCell.textContent = '—'; }
+        });
+        if (!selected) { alert('Select at least one material.'); return; }
+        document.getElementById('grand-quantity').textContent = grandQty.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' kg';
+        document.getElementById('grand-cost').textContent = 'SAR ' + grandCost.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+    calculateButton?.addEventListener('click', calculateMaterials);
+    document.getElementById('print-material-report')?.addEventListener('click', function () { calculateMaterials(); window.print(); });
+});
+</script>
+{% endblock %}
