@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Quality Library | BuildQuality{% endblock %}
+{% block content %}
+<div class="library-heading">
+    <div><h1>{% if selected_category %}{{ selected_category }} Library{% elif search %}Search Results{% else %}Quality Library{% endif %}</h1><p>{% if selected_category %}Browse and open verified {{ selected_category|lower }} resources.{% elif search %}Results for “{{ search }}”.{% else %}Browse standards, materials, templates, statements, and test resources.{% endif %}</p></div>
+    {% if current_user.is_admin %}<button class="btn btn-primary" onclick="document.getElementById('admin-editor').classList.toggle('hidden')">＋ Add Resource</button>{% endif %}
+</div>
+
+{% if current_user.is_admin %}
+<section id="admin-editor" class="admin-editor {% if not edit_link %}hidden{% endif %}">
+    <div class="editor-title"><div><span>Administrator tools</span><h2>{% if edit_link %}Edit Resource{% else %}Add New Resource{% endif %}</h2></div><button type="button" class="icon-close" onclick="this.closest('.admin-editor').classList.add('hidden')">×</button></div>
+    <form method="post" action="{{ url_for('save_link') }}" class="editor-grid">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="link_id" value="{{ edit_link.id if edit_link else '' }}">
+        <label>Resource Title<input name="title" value="{{ edit_link.title if edit_link else '' }}" required maxlength="220"></label>
+        <label>Library Category<select name="category" required>{% for c in categories %}<option value="{{ c }}" {% if (edit_link and edit_link.category == c) or (not edit_link and selected_category == c) %}selected{% endif %}>{{ c }}</option>{% endfor %}</select></label>
+        <label class="wide">Resource URL<input name="url" value="{{ edit_link.url if edit_link else '' }}" type="url" placeholder="https://..." required></label>
+        <label>Tags / File Type<input name="tags" value="{{ edit_link.tags if edit_link else '' }}" placeholder="PDF, ACI, concrete"></label>
+        <label>Short Description<textarea name="notes" rows="2">{{ edit_link.notes if edit_link else '' }}</textarea></label>
+        <div class="editor-actions"><button class="btn btn-primary" type="submit">{% if edit_link %}Save Changes{% else %}Add Resource{% endif %}</button>{% if edit_link %}<a class="btn btn-light" href="{{ url_for('library', category=selected_category) }}">Cancel</a>{% endif %}</div>
+    </form>
+</section>
+{% endif %}
+
+{% if not browsing %}
+<section class="metric-grid">
+    <div class="metric-card total"><span class="metric-icon">▤</span><div><small>Total Resources</small><strong>{{ stats.total_links }}</strong><em>Across all libraries</em></div></div>
+    {% for category in library_categories[:5] %}{% set meta=category_meta[category] %}<a class="metric-card" href="{{ url_for('library', category=category) }}"><span class="metric-icon i{{ loop.index }}">{% if category=='Codes' %}▤{% elif category=='Materials' %}◇{% elif category=='Quality Document Template' %}▣{% elif category=='Method Statement' %}▧{% else %}⚗{% endif %}</span><div><small>{{ meta.short }}</small><strong>{{ category_counts.get(category,0) }}</strong><em>{{ meta.description }}</em></div></a>{% endfor %}
+</section>
+
+<section class="dashboard-grid top-row">
+    <article class="panel featured-panel"><div class="panel-head"><h2>Featured Resources</h2><a href="{{ url_for('library', search='') }}">View all</a></div>{% for item in featured %}<div class="resource-row"><div class="resource-thumb">{{ resource_file_type(item)[:1] }}</div><div class="resource-info"><strong>{{ item.title }}</strong><p>{{ item.notes or item.category }}</p><span class="file-badge">{{ resource_file_type(item) }}</span></div><a class="outline-btn" href="{{ url_for('open_link', link_id=item.id) }}" target="_blank">Open</a></div>{% else %}<div class="empty-card">No resources yet. The administrator can add the first resource.</div>{% endfor %}</article>
+    <article class="panel"><div class="panel-head"><h2>Popular Codes</h2><a href="{{ url_for('library', category='Codes') }}">View all</a></div>{% for item in popular_codes %}<div class="simple-resource"><span class="doc-symbol">▤</span><div><strong>{{ item.title }}</strong><small>{{ item.notes or 'Technical code reference' }}</small></div><span class="file-badge">{{ resource_file_type(item) }}</span><a class="outline-btn small" href="{{ url_for('open_link', link_id=item.id) }}" target="_blank">View</a></div>{% else %}<div class="empty-card">Codes added by the administrator will appear here.</div>{% endfor %}</article>
+    <article class="panel"><div class="panel-head"><h2>Recent Additions</h2><a href="{{ url_for('library', search='all') }}">View all</a></div>{% for item in recent %}<div class="simple-resource recent"><span class="file-square {{ resource_file_type(item)|lower }}">{{ resource_file_type(item)[:3] }}</span><div><strong>{{ item.title }}</strong><small>{{ item.created_at.strftime('%b %d, %Y') if item.created_at else '' }} · {{ item.category }}</small></div><a class="outline-btn small" href="{{ url_for('open_link', link_id=item.id) }}" target="_blank">Open</a></div>{% else %}<div class="empty-card">Recently added resources will appear here.</div>{% endfor %}</article>
+</section>
+
+<section class="category-dashboard">
+    <article class="panel category-list"><div class="panel-head"><h2>Resource Categories</h2></div>{% for category in library_categories %}<a href="{{ url_for('library', category=category) }}"><span>{{ category }}</span><strong>{{ category_counts.get(category,0) }} ›</strong></a>{% endfor %}</article>
+    {% for category in library_categories[2:] %}{% set meta=category_meta[category] %}<article class="panel category-preview"><div class="preview-title"><span class="preview-icon">{% if category=='Quality Document Template' %}▣{% elif category=='Method Statement' %}▧{% elif category=='Test Reports' %}⚗{% else %}♜{% endif %}</span><div><h2>{{ meta.short }} Library</h2><p>{{ meta.description }}</p></div></div><div class="preview-items">{% for item in category_previews[category] %}<div><span>{{ item.title }}</span><b>{{ resource_file_type(item) }}</b></div>{% else %}<div class="empty-small">No resources available.</div>{% endfor %}</div><div class="preview-footer"><strong>{{ category_counts.get(category,0) }} Resources</strong><a class="outline-btn" href="{{ url_for('library', category=category) }}">Browse</a></div></article>{% endfor %}
+</section>
+{% else %}
+<section class="browse-toolbar"><div class="result-count"><strong>{{ links|length }}</strong> resource(s) found</div><form method="get" action="{{ url_for('library') }}"><input type="search" name="search" value="{{ search }}" placeholder="Search this library"><select name="category"><option value="">All Categories</option>{% for c in categories %}<option value="{{ c }}" {% if selected_category==c %}selected{% endif %}>{{ c }}</option>{% endfor %}</select><button class="btn btn-primary">Search</button><a class="btn btn-light" href="{{ url_for('library') }}">Reset</a></form></section>
+<section class="resource-catalog">{% for item in links %}<article class="catalog-card"><div class="catalog-icon">{{ resource_file_type(item)[:3] }}</div><div class="catalog-body"><div class="catalog-meta"><span>{{ item.category }}</span><b>{{ resource_file_type(item) }}</b></div><h2>{{ item.title }}</h2><p>{{ item.notes or 'Technical resource available to active subscribers.' }}</p><div class="tag-line">{{ item.tags or 'Quality Library' }}</div></div><div class="catalog-actions"><a class="btn btn-primary" href="{{ url_for('open_link', link_id=item.id) }}" target="_blank">Open Resource</a>{% if current_user.is_admin %}<a class="btn btn-light" href="{{ url_for('edit_link', link_id=item.id) }}">Edit</a><form method="post" action="{{ url_for('delete_link', link_id=item.id) }}" onsubmit="return confirm('Delete this resource permanently?')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-danger">Delete</button></form>{% endif %}</div></article>{% else %}<div class="empty-results"><span>⌕</span><h2>No matching resources</h2><p>Try another keyword or select a different library category.</p></div>{% endfor %}</section>
+{% endif %}
+{% endblock %}
