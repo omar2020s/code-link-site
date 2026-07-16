@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Quality Reference Library — 7-Day Free Trial{% endblock %}
+{% block content %}
+<section class="hero">
+    <div class="hero-copy">
+        <span class="eyebrow">Organized content for engineers</span>
+        <h1>Quality references, material data, and engineering codes in one place</h1>
+        <p>Create an account and receive full access to the technical library for {{ free_trial_days }} days. After the free trial ends, a paid subscription is required to continue.</p>
+        <div class="hero-actions">
+            <a class="btn primary large" href="{{ url_for('register') }}">Start {{ free_trial_days }}-Day Free Trial</a>
+            <a class="btn muted large" href="{{ url_for('login') }}">I Already Have an Account</a>
+        </div>
+    </div>
+    <div class="hero-panel">
+        <div class="feature-tile"><strong>{{ free_trial_days }}-Day Free Trial</strong><span>New users can explore the complete protected library before subscribing.</span></div>
+        <div class="feature-tile"><strong>Fast Search</strong><span>Search by title, category, keywords, notes, or URL.</span></div>
+        <div class="feature-tile"><strong>Saudi Mada Payments</strong><span>Continue after the trial with secure Mada card checkout through Moyasar.</span></div>
+    </div>
+</section>
+
+<section class="pricing-preview">
+    {% for plan in plans.values() %}
+    <article class="price-card">
+        <span class="plan-badge">{{ plan.badge }}</span>
+        <h2>{{ plan.name }}</h2>
+        <div class="price">{{ money_sar(plan.price_halalas) }}</div>
+        <p>Includes {{ plan.days }} paid days. Any unused trial or subscription time is preserved when you pay early.</p>
+        <a class="btn primary full" href="{{ url_for('register') }}">Start Free Trial</a>
+    </article>
+    {% endfor %}
+</section>
+{% endblock %}
